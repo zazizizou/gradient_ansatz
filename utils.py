@@ -143,7 +143,7 @@ def resize_1d(signal, nb_points, interp="bilinear"):
 
 
 def gauss(x, a, mu, sigma):
-    return a * np.exp(- (x - mu)**2/sigma**2)
+    return a * np.exp(- (x - mu)**2/(2*sigma**2))
 
 
 def gauss_2d_mask(x, sigma, amp=10, mu=[0, 0], padding=0):
