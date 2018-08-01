@@ -123,5 +123,5 @@ class CalibBubble:
     def __init__(self, line, radius, frame_start, frame_end):
         self.line = line
         self.radius = radius
-        self.frame_start = frame_start
-        self.frame_end = frame_end
+        self.frame_start = int(frame_start)
+        self.frame_end =   int(frame_end)
