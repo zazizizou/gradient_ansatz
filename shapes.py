@@ -1,7 +1,5 @@
-from numpy import sqrt, nan, arange
+from numpy import sqrt, pi
 from numbers import Number
-from scipy.optimize import curve_fit
-from utils import gauss
 
 
 class Circle:
@@ -9,6 +7,9 @@ class Circle:
         self.x = x
         self.y = y
         self.radius = radius
+
+    def area(self):
+        return pi*self.radius**2
 
 
 class Rectangle:
@@ -61,9 +62,10 @@ class Rectangle:
 
 
 class Point:
-    def __init__(self, x, y):
+    def __init__(self, x: Number, y: Number, frame: int = None) -> object:
         self.x = x
         self.y = y
+        self.frame = frame
 
     def __mul__(self, other):
         if isinstance(other, Number):

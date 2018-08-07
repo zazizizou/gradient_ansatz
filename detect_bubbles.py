@@ -5,6 +5,8 @@ import numpy as np
 from cv2 import imread, threshold, THRESH_BINARY
 from skimage.feature import peak_local_max
 from skimage import feature
+from skimage.filters import scharr
+from skimage.transform import hough_circle, hough_circle_peaks
 from copy import deepcopy
 from shapes import *
 from scipy.optimize import curve_fit
@@ -307,7 +309,7 @@ def fit_along_line(samples, values, fit_line):
     :return: gaussian mean from fit of type Point.
     """
     y_data = values
-    x_data = arange(0, len(y_data), 1)
+    x_data = np.arange(0, len(y_data), 1)
     lin_dir = fit_line.direction
     try:
         (_, mu, _), _ = curve_fit(gauss, x_data, y_data)
@@ -379,7 +381,7 @@ def sample_fit_line(fit_line, pos, img, max_len, nb_samples, bsize):
 
 
 def curve_from_orientation_fit(input_img,
-                               loc_max,
+                               start_point,
                                smooth_mask,
                                len_curve_threshold=120,
                                proportion_threshold=3,
@@ -389,8 +391,49 @@ def curve_from_orientation_fit(input_img,
                                fit_line_nb_samples=20,
                                fit_line_sample_box_size=1,
                                next_step_size=1/np.sqrt(2)):
+    """
+    Given an image containing a bubble and a starting point (typically a local maximum),
+    curve_from_orientation returns a list of Points, i.e. curve, along the curvature of
+    the bubble.
+
+    :param input_img: input image as np.array
+    :param start_point: starting point as Point. Typically local maximum
+    :param smooth_mask: smoothing mask of type np.array used by structure tensor to produce orientation.
+    :param len_curve_threshold: maximum curve length
+    :param proportion_threshold: curve width / curve height. When this threshold is reached,
+    the curve is complete
+    :param curve_preferred_direction: "UP" or "DOWN". Decides where to choose the next point when
+    orientation is ambiguous.
+    :param include_first_point: if True start_point is included in the result
+    :param fit_line_max_length: maximum fit line length
+    :param fit_line_nb_samples: number of samples on the fit line
+    :param fit_line_sample_box_size: fit line box size
+    :param next_step_size: distance between current point and next starting point
+    :return: list of Point describing the outer bubble curvature.
+
+    Example usage:
+    curve = curve_from_orientation_fit(input_img=one_pad,
+                                   loc_max=loc_max_pad,
+                                   smooth_mask=smooth_mask,
+                                   next_step_size=1,
+                                  proportion_threshold=2,
+                                   fit_line_nb_samples=30,
+                                   len_curve_threshold=40,
+                                   curve_preferred_direction="DOWN",
+                                  include_first_point=True)
+    curve += curve_from_orientation_fit(input_img=one_pad,
+                               loc_max=loc_max_pad,
+                               smooth_mask=smooth_mask,
+                               next_step_size=1,
+                              proportion_threshold=2,
+                                len_curve_threshold=13,
+                                fit_line_max_length=6,
+                            fit_line_nb_samples=30,
+                              curve_preferred_direction="UP",
+                              include_first_point=False)
+    """
     img = input_img
-    curr_pos = loc_max
+    curr_pos = start_point
     curve = [curr_pos]
     extr_x = curr_pos.x
     max_len  = fit_line_max_length
@@ -398,6 +441,7 @@ def curve_from_orientation_fit(input_img,
     bsize = fit_line_sample_box_size
     ssize = next_step_size
     orient = orientation_from_image(img, smooth_mask, digitize=False)
+
     while len(curve) < len_curve_threshold:
         try:
             curr_orientation = orient[curr_pos.get_coord(dtype="int")]
@@ -485,6 +529,7 @@ def bubble_from_curve_fit(curve, error_func=_lin_func):
         popt, pcov = curve_fit(half_circ, x_data, y_data,
                                p0=[init_circ.x, init_circ.y, init_circ.radius])
                                 # , sigma=err_data)
+        # pred_circ = Circle(*popt)
         pred_circ = Circle(init_circ.x, init_circ.y, np.abs(popt[2]))
     except RuntimeError:
         print("no fit!")
@@ -686,45 +731,6 @@ def adaptive_threshold(img_input, window_size, param, val_min=0, val_max=1):
     return img_result
 
 
-def extract_pad_image(input_img, pt, window_size, pad_mode="edge"):
-
-    im = deepcopy(input_img)
-    x_start = int(pt.x - np.floor(window_size / 2))
-    x_end   = int(pt.x + np.floor(window_size / 2))
-    y_start = int(pt.y - np.floor(window_size / 2))
-    y_end   = int(pt.y + np.floor(window_size / 2))
-
-    x_min_pad_val = 0
-    x_max_pad_val = 0
-    y_min_pad_val = 0
-    y_max_pad_val = 0
-
-    if x_start < 0:
-        x_min_pad_val = int(np.abs(x_start))
-        x_start = 0
-        # print("pad 1")
-    if x_end >= input_img.shape[0]:
-        x_max_pad_val = x_end - input_img.shape[0]
-        # print("pad 2")
-    if y_start < 0:
-        y_min_pad_val = int(np.abs(y_start))
-        y_start = 0
-        # print("pad 3", y_start, y_end + y_min_pad_val +1)
-    if y_end >= input_img.shape[1]:
-        y_max_pad_val = y_end - input_img.shape[1]
-        # print("pad 4")
-
-    im_result = np.pad(im,
-                ((x_min_pad_val, x_max_pad_val),
-                     (y_min_pad_val, y_max_pad_val)),
-                pad_mode)
-
-    im_result = im_result[x_start:x_end + x_min_pad_val, y_start:y_end + y_min_pad_val]
-    # assert im_result.shape == (window_size, window_size), \
-    #     "im_result.shape = " + str(im_result.shape)
-    return im_result
-
-
 def im_center(im):
     if im.shape[0] % 2 == 0:
         return Point(np.floor(im.shape[0] / 2), np.ceil(im.shape[0] / 2))
@@ -738,8 +744,8 @@ def _get_structure_tensor_features(im, features_window_size, sigma_st):
     center = im_center(im)
     Axx, Axy, Ayy = feature.structure_tensor(im, sigma=sigma_st)
     l1, l2 = feature.structure_tensor_eigvals(Axx, Axy, Ayy)
-    l1 = extract_pad_image(input_img=l1, pt=center, window_size=features_window_size)
-    l2 = extract_pad_image(input_img=l2, pt=center, window_size=features_window_size)
+    l1 = utils.extract_pad_image(input_img=l1, pt=center, window_size=features_window_size)
+    l2 = utils.extract_pad_image(input_img=l2, pt=center, window_size=features_window_size)
     l1 = arr_to_vec(l1)
     l2 = arr_to_vec(l2)
     features_arr = np.append(features_arr, l1)
@@ -752,8 +758,8 @@ def _get_hessian_matrix_features(im, features_window_size, sigma_hm):
     center = im_center(im)
     Hxx, Hxy, Hyy = feature.hessian_matrix(im, sigma=sigma_hm)
     h1, h2 = feature.hessian_matrix_eigvals(Hxx, Hxy, Hyy)
-    h1 = extract_pad_image(input_img=h1, pt=center, window_size=features_window_size)
-    h2 = extract_pad_image(input_img=h2, pt=center, window_size=features_window_size)
+    h1 = utils.extract_pad_image(input_img=h1, pt=center, window_size=features_window_size)
+    h2 = utils.extract_pad_image(input_img=h2, pt=center, window_size=features_window_size)
     h1 = arr_to_vec(h1)
     h2 = arr_to_vec(h2)
     features_arr = np.append(features_arr, h1)
@@ -791,7 +797,7 @@ def bubbles_from_image(img,
     local_max_candidates = [Point(l[0], l[1]) for l in lm]
 
     # get features for classification
-    local_max_candidates_img = [extract_pad_image(input_img=img, pt=lmd, window_size=10) for lmd in
+    local_max_candidates_img = [utils.extract_pad_image(input_img=img, pt=lmd, window_size=10) for lmd in
                                 local_max_candidates]
     local_max_candidates_features = [get_max_features(img=im, features_window_size=3) for im in
                                      local_max_candidates_img]
@@ -825,6 +831,20 @@ def bubbles_from_image(img,
         return [bubble_from_curve(cu) for cu in curves]
 
 
+def green_bubble_one(subimage, hough_radii, total_num_peaks=10):
+    edges = scharr(subimage)
+    hough_res = hough_circle(edges, hough_radii)
+    _, center_x, center_y, radii = hough_circle_peaks(hough_res,
+                                               hough_radii,
+                                               total_num_peaks=total_num_peaks)
+    res_circles = [Circle(cx, cy, r) for cx, cy, r in zip(center_x, center_y, radii)]
+    avg_x = np.mean([circ.x for circ in res_circles])
+    avg_y = np.mean([circ.y for circ in res_circles])
+    avg_r = np.mean([circ.radius for circ in res_circles])
+
+    return Circle(avg_x, avg_y, avg_r)
+
+
 def main():
 
     # read image(s)
@@ -844,7 +864,7 @@ def main():
     loc_max = Point(lm[0], lm[1])
 
     curve = curve_from_orientation_fit(input_img=img,
-                                       loc_max=loc_max,
+                                       start_point=loc_max,
                                        smooth_mask=smooth_mask)
 
 

@@ -51,15 +51,17 @@ def divide_img_grid(img, nx, ny):
     return sub_img
 
 
-def ll_to_ul(coord, img_size):
+def ll_to_ul(point, img_size):
     """
     change coordinate system from lower left (ll) to upper left (ul)
     """
+    coord = point.y
     x_axis = img_size/2
     if coord < x_axis:
-        return coord + abs(2*(coord-x_axis))
+        new_cord = coord + abs(2*(coord-x_axis))
     else:
-        return coord - abs(2*(coord-x_axis))
+        new_cord = coord - abs(2*(coord-x_axis))
+    return shapes.Point(point.x, new_cord)
 
 
 def add_motion_blur(img, step=1/2):
@@ -170,11 +172,55 @@ def my_structure_tensor(img, smooth_mask):
 
 
 def extract_pad_image(input_img, pt, window_size, pad_mode="edge"):
+    """
+    Extract a subimage from input_img with a fixed window size. If
+    the chosen window goes beyond image borders, return a padded
+    window with padding mode pad_mode.
+    :param input_img: 2d array
+    :param pt: Point center of subimage
+    :param window_size: int window size
+    :param pad_mode : (from np.pad documentation) str or function
+        One of the following string values or a user supplied function.
+        'constant'
+            Pads with a constant value.
+        'edge'
+            Pads with the edge values of array.
+        'linear_ramp'
+            Pads with the linear ramp between end_value and the
+            array edge value.
+        'maximum'
+            Pads with the maximum value of all or part of the
+            vector along each axis.
+        'mean'
+            Pads with the mean value of all or part of the
+            vector along each axis.
+        'median'
+            Pads with the median value of all or part of the
+            vector along each axis.
+        'minimum'
+            Pads with the minimum value of all or part of the
+            vector along each axis.
+        'reflect'
+            Pads with the reflection of the vector mirrored on
+            the first and last values of the vector along each
+            axis.
+        'symmetric'
+            Pads with the reflection of the vector mirrored
+            along the edge of the array.
+        'wrap'
+            Pads with the wrap of the vector along the axis.
+            The first values are used to pad the end and the
+            end values are used to pad the beginning.
+        <function>
+            Padding function, see Notes.
+    :return: 2d array padded image.
+    """
+
     im = deepcopy(input_img)
-    x_start = pt.x - window_size
-    y_start = pt.y - window_size
-    x_end   = pt.x + window_size
-    y_end   = pt.y + window_size
+    x_start = int(pt.x - np.floor(window_size / 2))
+    x_end   = int(pt.x + np.floor(window_size / 2))
+    y_start = int(pt.y - np.floor(window_size / 2))
+    y_end   = int(pt.y + np.floor(window_size / 2))
 
     x_min_pad_val = 0
     x_max_pad_val = 0
@@ -182,19 +228,37 @@ def extract_pad_image(input_img, pt, window_size, pad_mode="edge"):
     y_max_pad_val = 0
 
     if x_start < 0:
-        x_min_pad_val = np.abs(x_start)
+        x_min_pad_val = int(np.abs(x_start))
+        x_start = 0
     if x_end >= input_img.shape[0]:
-        x_max_pad_val = x_end - input_img.shape[0] - 1
-    if y_start < 0:
-        y_min_pad_val = np.abs(y_start)
-    if y_end >= input_img.shape[1]:
-        y_max_pad_val = y_end - input_img.shape[1] - 1
+        x_max_pad_val = x_end - input_img.shape[0]
 
-    im = np.pad(im,
+    if y_start < 0:
+        y_min_pad_val = int(np.abs(y_start))
+        y_start = 0
+
+    if y_end >= input_img.shape[1]:
+        y_max_pad_val = y_end - input_img.shape[1]
+
+    im_result = np.pad(im,
                 ((x_min_pad_val, x_max_pad_val),
                      (y_min_pad_val, y_max_pad_val)),
                 pad_mode)
+    im_result = im_result[x_start:x_end + x_min_pad_val, y_start:y_end + y_min_pad_val]
 
-    return im[x_start:x_end, y_start:y_end]
+    assert im_result.shape == (window_size, window_size), \
+         "im_result.shape = " + str(im_result.shape)
+
+    return im_result
+
+
+def get_tracking_data(tracking_data_path, img_shape):
+    x_dim = img_shape[1]
+    y_dim = img_shape[0]
+    frames, x_arr, y_arr = np.loadtxt(tracking_data_path).T
+    positions = []
+    for f , x, y in zip(frames, x_arr, y_arr):
+        positions.append(shapes.Point(x*x_dim, y*y_dim, f))
+    return positions
 
 

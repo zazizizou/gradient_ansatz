@@ -2,11 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8800dc96-baa0-4ddc-8673-220ccbbd64a5" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/gradient_ansatz.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradient_ansatz.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/DoF_cailb-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/DoF_cailb-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/radius_calibration-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/radius_calibration-checkpoint.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DoF_cailb.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/DoF_cailb.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DoF_stabil.blend" beforeDir="false" afterPath="$PROJECT_DIR$/DoF_stabil.blend" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/circle_fit.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/circle_fit.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/detect_bubbles.py" beforeDir="false" afterPath="$PROJECT_DIR$/detect_bubbles.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/radius_calibration.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/radius_calibration.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shapes.py" beforeDir="false" afterPath="$PROJECT_DIR$/shapes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/subpixel_orioentation.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/subpixel_orioentation.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -27,44 +33,51 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="6" />
+          <entry key="py" value="7" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="6" />
+          <entry key="Python" value="7" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="176" />
+          <entry key="py" value="2740" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="176" />
+          <entry key="Python" value="2740" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.611465">
+    <splitter split-orientation="horizontal" split-proportion="0.5732484">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/detect_bubbles.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-440">
-                  <caret line="97" column="27" selection-start-line="97" selection-start-column="27" selection-end-line="97" selection-end-column="27" />
+                <state relative-caret-position="579">
+                  <caret line="531" column="10" selection-start-line="531" selection-start-column="10" selection-end-line="531" selection-end-column="10" />
+                  <folding>
+                    <marker date="1533641638410" expanded="true" signature="29609:30159" ph="..." />
+                  </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/utils.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="413">
-                  <caret line="145" column="39" selection-start-line="145" selection-start-column="39" selection-end-line="145" selection-end-column="39" />
+                <state relative-caret-position="855">
+                  <caret line="72" column="52" selection-start-line="72" selection-start-column="52" selection-end-line="72" selection-end-column="52" />
+                  <folding>
+                    <element signature="e#0#18#0" expanded="true" />
+                    <marker date="1533640132906" expanded="true" signature="7388:7393" ph="..." />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -78,15 +91,6 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/shapes.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1219">
-                  <caret line="105" column="29" selection-start-line="105" selection-start-column="29" selection-end-line="105" selection-end-column="29" />
-                </state>
-              </provider>
-            </entry>
-          </file>
         </leaf>
       </split-first>
       <split-second>
@@ -94,10 +98,11 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/shapes.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1196">
-                  <caret line="126" column="34" selection-start-line="126" selection-start-column="34" selection-end-line="126" selection-end-column="34" />
+                <state relative-caret-position="735">
+                  <caret line="67" column="26" selection-start-line="67" selection-start-column="26" selection-end-line="67" selection-end-column="26" />
                   <folding>
-                    <marker date="1533046090130" expanded="true" signature="3237:3428" ph="..." />
+                    <element signature="e#0#39#0" expanded="true" />
+                    <marker date="1533641157525" expanded="true" signature="3293:3496" ph="..." />
                   </folding>
                 </state>
               </provider>
@@ -119,7 +124,6 @@
       <find>re</find>
       <find>gaus</find>
       <find>zero</find>
-      <find>extrac</find>
       <find>get_max</find>
       <find>curve_fi</find>
       <find>bubble_from_cur</find>
@@ -140,6 +144,12 @@
       <find>(_</find>
       <find>pad</find>
       <find>gauss</find>
+      <find>_exp</find>
+      <find>to_ul</find>
+      <find>bubble_from_cu</find>
+      <find>Point(</find>
+      <find>extrac</find>
+      <find>bubble_from_</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -152,15 +162,15 @@
         <option value="$PROJECT_DIR$/../ring_ansatz/evaluate.py" />
         <option value="$PROJECT_DIR$/../utils/utils.py" />
         <option value="$PROJECT_DIR$/evaluate.py" />
-        <option value="$PROJECT_DIR$/detect_bubbles.py" />
         <option value="$PROJECT_DIR$/utils.py" />
         <option value="$PROJECT_DIR$/shapes.py" />
+        <option value="$PROJECT_DIR$/detect_bubbles.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1657" />
-    <option name="width" value="2192" />
+    <option name="x" value="1909" />
+    <option name="width" value="1940" />
     <option name="height" value="2111" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -246,20 +256,20 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1105" y="0" width="1461" height="1407" extended-state="0" />
+    <frame x="1273" y="0" width="1293" height="1407" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.18789808" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32954547" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3288854" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.31955922" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39914772" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Terminal" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32967034" />
       <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info anchor="bottom" id="Python Console" order="10" />
@@ -282,13 +292,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/evaluate.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="182">
-          <caret line="14" column="4" selection-start-line="14" selection-start-column="4" selection-end-line="14" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/310767749/numpy/core/umath.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="326">
@@ -296,26 +299,48 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/detect_bubbles.py">
+    <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/310767749/builtins.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-440">
-          <caret line="97" column="27" selection-start-line="97" selection-start-column="27" selection-end-line="97" selection-end-column="27" />
+        <state relative-caret-position="-1429">
+          <caret line="732" column="8" selection-start-line="732" selection-start-column="8" selection-end-line="732" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/evaluate.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="14" column="4" selection-start-line="14" selection-start-column="4" selection-end-line="14" selection-end-column="4" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="413">
-          <caret line="145" column="39" selection-start-line="145" selection-start-column="39" selection-end-line="145" selection-end-column="39" />
+        <state relative-caret-position="855">
+          <caret line="72" column="52" selection-start-line="72" selection-start-column="52" selection-end-line="72" selection-end-column="52" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <marker date="1533640132906" expanded="true" signature="7388:7393" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/shapes.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1196">
-          <caret line="126" column="34" selection-start-line="126" selection-start-column="34" selection-end-line="126" selection-end-column="34" />
+        <state relative-caret-position="735">
+          <caret line="67" column="26" selection-start-line="67" selection-start-column="26" selection-end-line="67" selection-end-column="26" />
           <folding>
-            <marker date="1533046090130" expanded="true" signature="3237:3428" ph="..." />
+            <element signature="e#0#39#0" expanded="true" />
+            <marker date="1533641157525" expanded="true" signature="3293:3496" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/detect_bubbles.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="579">
+          <caret line="531" column="10" selection-start-line="531" selection-start-column="10" selection-end-line="531" selection-end-column="10" />
+          <folding>
+            <marker date="1533641638410" expanded="true" signature="29609:30159" ph="..." />
           </folding>
         </state>
       </provider>
