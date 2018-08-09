@@ -5,7 +5,7 @@ import numpy as np
 from cv2 import imread, threshold, THRESH_BINARY
 from skimage.feature import peak_local_max
 from skimage import feature
-from skimage.filters import scharr
+from skimage.filters import scharr, sobel
 from skimage.transform import hough_circle, hough_circle_peaks
 from copy import deepcopy
 from shapes import *
@@ -14,6 +14,8 @@ from scipy.misc import imresize
 import pickle
 import utils
 from evaluate import inter_area
+from scipy.signal import argrelextrema
+from scipy.ndimage.filters import gaussian_filter1d
 
 """
 Coordinate system is:
@@ -494,16 +496,16 @@ def curve_from_orientation_fit(input_img,
         return curve[1:]
 
 
-def bubble_from_curve(curve, shape="rectangle"):
+def bubble_from_curve(curve, output_shape="circle"):
     loc_max = curve[0]
     max_point = loc_max
     for c in curve:
         if c.x > max_point.x:
             max_point = c
     bubble_circ = Circle(loc_max.x, max_point.y, (max_point.x - loc_max.x))
-    if shape == "circle":
+    if output_shape == "circle":
         return bubble_circ
-    else: # shape == "circle":
+    else: # shape == "rectangle":
         return circle_to_rectangle(bubble_circ)
 
 
@@ -519,7 +521,7 @@ def dist(p1, p2):
     return np.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2)
 
 
-def bubble_from_curve_fit(curve, error_func=_lin_func):
+def bubble_from_curve_fit(curve, error_func=_lin_func, output_shape="circle"):
     start_pos = curve[0]
     x_data = [pt.x for pt in curve]
     y_data = [pt.y for pt in curve]
@@ -535,7 +537,10 @@ def bubble_from_curve_fit(curve, error_func=_lin_func):
         print("no fit!")
         pred_circ = init_circ
 
-    return circle_to_rectangle(pred_circ)
+    if output_shape == "rectangle":
+        return circle_to_rectangle(pred_circ)
+    else:
+        return pred_circ
 
 
 def _slope(curve, idx):
@@ -733,9 +738,9 @@ def adaptive_threshold(img_input, window_size, param, val_min=0, val_max=1):
 
 def im_center(im):
     if im.shape[0] % 2 == 0:
-        return Point(np.floor(im.shape[0] / 2), np.ceil(im.shape[0] / 2))
+        return Point(np.floor(im.shape[0] / 2), np.ceil(im.shape[1] / 2))
     else:
-        return Point(im.shape[0], im.shape[0])
+        return Point(np.ceil(im.shape[0]/2), np.ceil(im.shape[1]/2))
 
 
 def _get_structure_tensor_features(im, features_window_size, sigma_st):
@@ -831,18 +836,106 @@ def bubbles_from_image(img,
         return [bubble_from_curve(cu) for cu in curves]
 
 
-def green_bubble_one(subimage, hough_radii, total_num_peaks=10):
-    edges = scharr(subimage)
-    hough_res = hough_circle(edges, hough_radii)
-    _, center_x, center_y, radii = hough_circle_peaks(hough_res,
-                                               hough_radii,
-                                               total_num_peaks=total_num_peaks)
-    res_circles = [Circle(cx, cy, r) for cx, cy, r in zip(center_x, center_y, radii)]
-    avg_x = np.mean([circ.x for circ in res_circles])
-    avg_y = np.mean([circ.y for circ in res_circles])
-    avg_r = np.mean([circ.radius for circ in res_circles])
+def green_bubble_one(subimage,
+                     method,
+                     hough_radii=None,
+                     total_num_peaks=10,
+                     max_offset=10,
+                     fit_refine=False):
+    """
+    estimate bubble radius and position using hough circle transform,
+    assuming there is only one back lit bubble in subimage located around
+    the image center.
+    :param subimage: input image containing one bubble.
+    :param method: "hough" or "peak_dist"
+    :param hough_radii: list of radii candidates
+    :param total_num_peaks: number of candidate bubbles
+    :param max_offset: maximum distance between image center and circle center.
+    :param fit_refine: for method="peak_dist" only. If True refine position of center
+    and position of edge using an analytical gauss fit.
+    :return: Circle describing location and radius of bubble.
+    """
+    edges = sobel(subimage)
+    im_cent = Point(int(subimage.shape[1]/2) , int(subimage.shape[0]/2))
+    if method == "hough":
+        hough_res = hough_circle(edges, hough_radii)
+        _, center_x, center_y, radii = hough_circle_peaks(hough_res,
+                                                   hough_radii,
+                                                   total_num_peaks=total_num_peaks)
+        res_circles = [Circle(cx, cy, r) for cx, cy, r in zip(center_x, center_y, radii)]
+        if len(res_circles) != 0:
+            avg_x = np.mean([circ.x for circ in res_circles if circ.x - im_cent.x < max_offset])
+            avg_y = np.mean([circ.y for circ in res_circles if circ.y - im_cent.y < max_offset])
+            avg_r = np.mean([circ.radius for circ in res_circles])
+        else:
+            avg_x = np.nan
+            avg_y = np.nan
+            avg_r = np.nan
 
-    return Circle(avg_x, avg_y, avg_r)
+        return Circle(avg_x, avg_y, avg_r)
+
+    elif method == "peak_dist":
+
+        plm = peak_local_max(subimage, min_distance=5)
+        local_max_candidates = [Point(l[0], l[1]) for l in plm]
+        mid_peak = Point(im_cent.x, im_cent.y)
+
+        for mo in range(max_offset):
+            lm = [l for l in local_max_candidates if dist(l, im_cent) <= mo+1]
+            if len(lm) == 1:
+                mid_peak = lm[0]
+                break
+
+        signal = edges[mid_peak.y, :]
+        right_peak_arg = argrelextrema(gaussian_filter1d(signal, sigma=2), np.greater)[0][-1]
+        right_peak = Point(right_peak_arg, mid_peak.y)
+
+        if fit_refine:
+            g0 = subimage[mid_peak.y, mid_peak.x - 1]
+            g1 = subimage[mid_peak.y, mid_peak.x]
+            g2 = subimage[mid_peak.y, mid_peak.x + 1]
+
+            mu_right_peak_x, _ = utils.gauss_fit_analytical(g0, g1, g2)
+            right_peak.x = mu_right_peak_x + right_peak.x
+        radius = dist(mid_peak, right_peak)
+
+        return Circle(mid_peak.x, mid_peak.y, radius), signal
+
+
+def red_bubble_one(subimg):
+    plm = peak_local_max(subimg, min_distance=5)[0] #only one peak is needed
+    lm = Point(plm[0], plm[1])
+
+    size = 31
+    xx = np.linspace(0, 10, size)
+    yy = np.linspace(0, 10, size)
+    XX, YY = np.meshgrid(xx, yy)
+    smooth_mask = utils.gauss_2d_mask([XX, YY], amp=10, mu=[5, 5], sigma=[1, 1])
+
+    curve = curve_from_orientation_fit(input_img=subimg,
+                                       start_point=lm,
+                                       smooth_mask=smooth_mask,
+                                       len_curve_threshold=30,
+                                       proportion_threshold=2.2,
+                                       curve_preferred_direction="UP",
+                                       include_first_point=True,
+                                       fit_line_max_length=5,
+                                       fit_line_nb_samples=10,
+                                       fit_line_sample_box_size=1)
+
+    curve += curve_from_orientation_fit(input_img=subimg,
+                                       start_point=lm,
+                                       smooth_mask=smooth_mask,
+                                       len_curve_threshold=30,
+                                       proportion_threshold=2.2,
+                                       curve_preferred_direction="DOWN",
+                                       include_first_point=False,
+                                       fit_line_max_length=5,
+                                       fit_line_nb_samples=10,
+                                       fit_line_sample_box_size=1)
+    print("################################### curve", curve)
+
+    return bubble_from_curve_fit(curve)
 
 
 def main():

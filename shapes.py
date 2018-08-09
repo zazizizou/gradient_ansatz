@@ -2,6 +2,16 @@ from numpy import sqrt, pi
 from numbers import Number
 
 
+"""
+Coordinate system is:
+.-–-> y
+|
+|
+v
+x
+"""
+
+
 class Circle:
     def __init__(self, x, y, radius):
         self.x = x
@@ -46,7 +56,7 @@ class Rectangle:
         if (self.xmax == other.xmax and
             self.ymax == other.ymax and
             self.height == other.height and
-            self.width == other.width ):
+            self.width == other.width):
                 return True
         else:
             return False

@@ -51,17 +51,17 @@ def divide_img_grid(img, nx, ny):
     return sub_img
 
 
-def ll_to_ul(point, img_size):
+def ll_to_ul(point, img_size_x):
     """
     change coordinate system from lower left (ll) to upper left (ul)
     """
     coord = point.y
-    x_axis = img_size/2
+    x_axis = img_size_x/2
     if coord < x_axis:
         new_cord = coord + abs(2*(coord-x_axis))
     else:
         new_cord = coord - abs(2*(coord-x_axis))
-    return shapes.Point(point.x, new_cord)
+    return shapes.Point(point.x, new_cord, point.frame)
 
 
 def add_motion_blur(img, step=1/2):
@@ -215,12 +215,13 @@ def extract_pad_image(input_img, pt, window_size, pad_mode="edge"):
             Padding function, see Notes.
     :return: 2d array padded image.
     """
+    assert window_size % 2 == 0, "window_size must be even"
 
     im = deepcopy(input_img)
-    x_start = int(pt.x - np.floor(window_size / 2))
-    x_end   = int(pt.x + np.floor(window_size / 2))
-    y_start = int(pt.y - np.floor(window_size / 2))
-    y_end   = int(pt.y + np.floor(window_size / 2))
+    x_start = int(int(pt.x) - np.floor(window_size / 2))
+    x_end   = int(int(pt.x) + np.floor(window_size / 2))
+    y_start = int(int(pt.y) - np.floor(window_size / 2))
+    y_end   = int(int(pt.y) + np.floor(window_size / 2))
 
     x_min_pad_val = 0
     x_max_pad_val = 0
@@ -228,22 +229,28 @@ def extract_pad_image(input_img, pt, window_size, pad_mode="edge"):
     y_max_pad_val = 0
 
     if x_start < 0:
+        # print("x_start < 0")
         x_min_pad_val = int(np.abs(x_start))
         x_start = 0
+
     if x_end >= input_img.shape[0]:
+        # print("x_end >= input_img.shape[0]")
         x_max_pad_val = x_end - input_img.shape[0]
 
     if y_start < 0:
+        # print("y_start < 0")
         y_min_pad_val = int(np.abs(y_start))
         y_start = 0
 
     if y_end >= input_img.shape[1]:
+        # print("y_end >= input_img.shape[1]")
         y_max_pad_val = y_end - input_img.shape[1]
 
     im_result = np.pad(im,
                 ((x_min_pad_val, x_max_pad_val),
                      (y_min_pad_val, y_max_pad_val)),
                 pad_mode)
+    # print("np.pad shape:", im_result.shape)
     im_result = im_result[x_start:x_end + x_min_pad_val, y_start:y_end + y_min_pad_val]
 
     assert im_result.shape == (window_size, window_size), \
@@ -257,8 +264,16 @@ def get_tracking_data(tracking_data_path, img_shape):
     y_dim = img_shape[0]
     frames, x_arr, y_arr = np.loadtxt(tracking_data_path).T
     positions = []
-    for f , x, y in zip(frames, x_arr, y_arr):
-        positions.append(shapes.Point(x*x_dim, y*y_dim, f))
-    return positions
+    for f, x, y in zip(frames, x_arr, y_arr):
+        positions.append(shapes.Point(x*x_dim, y*y_dim, int(f)))
+    return [ll_to_ul(pos, x_dim) for pos in positions]
+
+
+def gauss_fit_analytical(g0, g1, g2):
+
+    mu = (np.log(g0/g1) + 1) / (-np.log(g2/g1) - 1)
+    sigma = np.sqrt(2 * (np.log(g0/g1) + np.log(g2/g1)))
+
+    return mu, sigma
 
 
