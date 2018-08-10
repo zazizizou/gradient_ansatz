@@ -9,7 +9,7 @@ from skimage.filters import scharr, sobel
 from skimage.transform import hough_circle, hough_circle_peaks
 from copy import deepcopy
 from shapes import *
-from scipy.optimize import curve_fit
+from scipy.optimize import curve_fit, leastsq
 from scipy.misc import imresize
 import pickle
 import utils
@@ -313,12 +313,15 @@ def fit_along_line(samples, values, fit_line):
     y_data = values
     x_data = np.arange(0, len(y_data), 1)
     lin_dir = fit_line.direction
+    fit_converged = False
     try:
         (_, mu, _), _ = curve_fit(gauss, x_data, y_data)
+        fit_converged = True
         print("fit converged! mu=", mu)
         print("result point = ", (mu * lin_dir + samples[0]).get_coord())
     except RuntimeError:
         mu = x_data[int(np.floor(len(x_data)/2))]
+        fit_converged = False
         print("no fit, mu =", mu)
         print("no fit, direction=", lin_dir.get_coord())
 
@@ -331,6 +334,8 @@ def fit_along_line(samples, values, fit_line):
         result = samples[0]
     else:
         result = samples[int(np.floor(mu))]
+    if fit_converged:
+        result.is_fit_result = True
     print("result point: ", result.get_coord())
     return result
 
@@ -446,7 +451,7 @@ def curve_from_orientation_fit(input_img,
     ssize = next_step_size
     orient = orientation_from_image(img, smooth_mask, digitize=False)
 
-    while len(curve) < len_curve_threshold:
+    for _ in range(len_curve_threshold):
         try:
             curr_orientation = orient[curr_pos.get_coord(dtype="int")]
             curr_orient_dir = Point(np.sin(curr_orientation), np.cos(curr_orientation))
@@ -469,7 +474,8 @@ def curve_from_orientation_fit(input_img,
 
             ############################################################################
 
-            curve += [refined_curr_pos]
+            if refined_curr_pos.is_fit_result:
+                curve += [refined_curr_pos]
 
             if curve_preferred_direction == "DOWN":
                 next_pos_orient = curr_orientation + np.pi/2
@@ -524,32 +530,61 @@ def dist(p1, p2):
     return np.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2)
 
 
-def bubble_from_curve_fit(curve, error_func=_lin_func, output_shape="circle"):
-    start_pos = curve[0]
+def circle_fit(x_data, y_data):
+    """
+    code copied from https://scipy-cookbook.readthedocs.io/items/Least_Squares_Circle.html
+    TODO: adjust to own code style
+    (---- ^ lol no one has time for that)
+    :param x_data:
+    :param y_data:
+    :return:
+    """
+    x = x_data
+    y = y_data
+    x_m = np.mean(x)
+    y_m = np.mean(y)
+
+    def calc_R(xc, yc):
+        """ calculate the distance of each 2D points from the center (xc, yc) """
+        return sqrt((x - xc) ** 2 + (y - yc) ** 2)
+
+    def f_2(c):
+        """ calculate the algebraic distance between the data points and the
+        mean circle centered at c=(xc, yc) """
+        Ri = calc_R(*c)
+        return Ri - Ri.mean()
+
+    center_estimate = x_m, y_m
+    center_2, ier = leastsq(f_2, center_estimate)
+
+    xc_2, yc_2 = center_2
+    Ri_2 = calc_R(*center_2)
+    R_2 = Ri_2.mean()
+    residu_2 = sum((Ri_2 - R_2) ** 2)
+
+    return xc_2, yc_2, R_2, residu_2
+
+
+def bubble_from_curve_fit(curve, output_shape="circle", verbose=False):
+
     x_data = [pt.x for pt in curve]
     y_data = [pt.y for pt in curve]
-    err_data = [error_func(dist(cu, start_pos)) for cu in curve]
-    init_circ = bubble_from_curve(curve)
-    try:
-        popt, pcov = curve_fit(half_circ, x_data, y_data,
-                               p0=[init_circ.x, init_circ.y, init_circ.radius])
-                                # , sigma=err_data)
-        # pred_circ = Circle(*popt)
-        pred_circ = Circle(init_circ.x, init_circ.y, np.abs(popt[2]))
+
+    xc, yc, r, _ = circle_fit(x_data, y_data)
+
+    pred_circ = Circle(xc, yc, r)
+
+    if verbose:
         ################
         print("----- bubble_from_curve info -----")
         print("x_data", x_data)
         print("y_data", y_data)
-        print("popt", popt)
+        print("xc, yc, r", xc, yc, r)
         ################
-
-    except RuntimeError:
-        print("no fit!")
-        pred_circ = init_circ
 
     if output_shape == "rectangle":
         return circle_to_rectangle(pred_circ)
-    else:
+    else: # output_shape == "circle":
         return pred_circ
 
 
@@ -841,7 +876,7 @@ def bubbles_from_image(img,
         curves.append(cu)
 
     if from_fit:
-        return [bubble_from_curve_fit(curve=cu, error_func=error_func) for cu in curves]
+        return [bubble_from_curve_fit(curve=cu) for cu in curves]
     else:
         return [bubble_from_curve(cu) for cu in curves]
 
@@ -912,25 +947,18 @@ def green_bubble_one(subimage,
         return Circle(mid_peak.x, mid_peak.y, radius), signal
 
 
-def red_bubble_one(subimg, verbose=True):
-    if verbose:
-        print("#-#-#-#-#-#- new_bubble -#-#-#-#-#-#-",
-              peak_local_max(subimg, min_distance=5, threshold_abs=50))
+def red_bubble_one(subimg, smooth_mask, verbose=True):
 
     plm = peak_local_max(subimg, min_distance=5, threshold_abs=50)
-    #print(plm)#only one peak is needed
+
+    if verbose:
+        print("#-#-#-#-#-#- new_bubble -#-#-#-#-#-#-", plm)
+
     if len(plm) != 0:
-        print(plm)
         plm = plm[0]
         lm = Point(plm[0], plm[1])
     else:
-        return Circle(1,1,1)
-
-    size = 31
-    xx = np.linspace(0, 10, size)
-    yy = np.linspace(0, 10, size)
-    XX, YY = np.meshgrid(xx, yy)
-    smooth_mask = utils.gauss_2d_mask([XX, YY], amp=10, mu=[30, 30], sigma=[1, 1])
+        return Circle(1, 1, 1)
 
     curve = curve_from_orientation_fit(input_img=subimg,
                                        start_point=lm,

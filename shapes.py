@@ -72,10 +72,15 @@ class Rectangle:
 
 
 class Point:
-    def __init__(self, x: Number, y: Number, frame: int = None) -> object:
+    def __init__(self,
+                 x: Number,
+                 y: Number,
+                 frame: int = None,
+                 is_fit_result: bool = False) -> object:
         self.x = x
         self.y = y
         self.frame = frame
+        self.is_fit_result = is_fit_result
 
     def __mul__(self, other):
         if isinstance(other, Number):
