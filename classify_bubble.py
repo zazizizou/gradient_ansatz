@@ -50,7 +50,9 @@ def get_salient_peaks(sig_z):
         return peaks_arg[first_peak_arg], np.nan
 
 
-def get_bubble_from_signal(sig_x, sig_y, sig_z, calib_radius_func):
+def get_bubble_from_signal(sig_x, sig_y, sig_z, calib_radius_func, signal_inverted):
+    if signal_inverted:
+        sig_z = np.invert(sig_z)
 
     first_peak_arg, second_peak_arg = get_salient_peaks(sig_z)
     radius = calib_radius_func(np.abs(second_peak_arg - first_peak_arg))
@@ -80,7 +82,7 @@ def get_features(sig_z):
     return [peak1_z, peak2_z, dist_peaks]
 
 
-def logistic_regression_classifier(sig_z, saved_model_path="logistic_regression.pickle"):
+def logistic_regression_classifier(sig_z, saved_model_path="data/models/logistic_regression.pickle"):
     features = get_features(sig_z)
     with open(saved_model_path, "rb") as handle:
         model = pickle.load(handle)
@@ -112,13 +114,14 @@ def manual_bubble_classifier(sig_z, second_peak_min_thr=30, second_peak_max_thr=
 def cnn_classifier(sig_z, saved_model_path="data/models/bubbleNet1D.h5"):
     model = load_model(saved_model_path)
     sig_z = np.reshape(sig_z, (1, sig_z.shape[0], 1))
-    if model.predict_classes(sig_z):
+    if model.predict_classes(sig_z, verbose=0):
         return True
     else:
         return False
 
 
 def is_bubble(sig_z, classifier_name):
+
     if classifier_name == "manual":
         return manual_bubble_classifier(sig_z)
     elif classifier_name == "logistic_regression":
@@ -136,7 +139,8 @@ def detec_bubble(img,
                  classifier,
                  threshold_abs=50,
                  min_distance=2,
-                 bubble_type="Rectangle"):
+                 output_shape="Rectangle",
+                 signal_inverted=False):
 
     signals_x, signals_y, signals_z = get_candidate_signals(img,
                                                             signal_len,
@@ -144,13 +148,13 @@ def detec_bubble(img,
                                                             min_distance=min_distance,
                                                             smooth_img=False)
 
-    bubbles = [get_bubble_from_signal(sig_x, sig_y, sig_z, calib_radius_func)
-                                    for (sig_x, sig_y, sig_z) in zip(signals_x, signals_y, signals_z)
-                                    if is_bubble(sig_z, classifier)]
+    bubbles = [get_bubble_from_signal(sig_x, sig_y, sig_z, calib_radius_func, signal_inverted)
+                            for (sig_x, sig_y, sig_z) in zip(signals_x, signals_y, signals_z)
+                            if is_bubble(sig_z, classifier)]
 
-    if bubble_type == "Circle":
+    if output_shape == "Circle":
         return bubbles
-    elif bubble_type == "Rectangle":
+    elif output_shape == "Rectangle":
         return [circle_to_rectangle(bubb) for bubb in bubbles]
     else:
         print("WARNING: return type not supported. Returning circles")

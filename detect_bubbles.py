@@ -320,7 +320,7 @@ def fit_along_line(samples, values, fit_line):
     except RuntimeError:
         mu = x_data[int(np.floor(len(x_data)/2))]
         print("no fit, mu =", mu)
-        print("no fit, direction=", lin_dir)
+        print("no fit, direction=", lin_dir.get_coord())
 
     print("samples 0:", samples[0].get_coord())
     print("len(samples)", len(samples))
@@ -392,7 +392,8 @@ def curve_from_orientation_fit(input_img,
                                fit_line_max_length=10,
                                fit_line_nb_samples=20,
                                fit_line_sample_box_size=1,
-                               next_step_size=1/np.sqrt(2)):
+                               next_step_size=1/np.sqrt(2),
+                               verbose=False):
     """
     Given an image containing a bubble and a starting point (typically a local maximum),
     curve_from_orientation returns a list of Points, i.e. curve, along the curvature of
@@ -411,6 +412,7 @@ def curve_from_orientation_fit(input_img,
     :param fit_line_nb_samples: number of samples on the fit line
     :param fit_line_sample_box_size: fit line box size
     :param next_step_size: distance between current point and next starting point
+    :para, verbose: if True print progress and log info
     :return: list of Point describing the outer bubble curvature.
 
     Example usage:
@@ -454,15 +456,16 @@ def curve_from_orientation_fit(input_img,
 
             ###########################################################################
                                         #####  log  ######
-
-            print("############ new position ############")
-            print("curr_pos: ", curr_pos.get_coord())
-            print("curr_orientation", curr_orientation / (2*np.pi) * 360)
-            print("fit_line=", fit_line.point.get_coord(), fit_line.direction.get_coord())
-            for s, v in zip(samples, values):
-                print(s.get_coord(), v)
-            if isinstance(refined_curr_pos, Point):
-                print("refined_curr_pos=", refined_curr_pos.get_coord())
+            if verbose:
+                print("############ new position ############")
+                print("curr_pos: ", curr_pos.get_coord())
+                print("curr_orientation", curr_orientation / (2*np.pi) * 360)
+                print("fit_line=", fit_line.point.get_coord(), fit_line.direction.get_coord())
+                for s, v in zip(samples, values):
+                    print(s.get_coord(), v)
+                if isinstance(refined_curr_pos, Point):
+                    print("refined_curr_pos=", refined_curr_pos.get_coord())
+                print("current curve len", len(curve))
 
             ############################################################################
 
@@ -514,7 +517,7 @@ def _lin_func(x):
 
 
 def half_circ(x, a, b, r):
-    return np.sqrt(np.abs(r**2 - (x-a)**2)) + (b**2)
+    return np.sqrt(np.abs(r**2 - (x-a)**2)) + b**2
 
 
 def dist(p1, p2):
@@ -533,6 +536,13 @@ def bubble_from_curve_fit(curve, error_func=_lin_func, output_shape="circle"):
                                 # , sigma=err_data)
         # pred_circ = Circle(*popt)
         pred_circ = Circle(init_circ.x, init_circ.y, np.abs(popt[2]))
+        ################
+        print("----- bubble_from_curve info -----")
+        print("x_data", x_data)
+        print("y_data", y_data)
+        print("popt", popt)
+        ################
+
     except RuntimeError:
         print("no fit!")
         pred_circ = init_circ
@@ -902,38 +912,50 @@ def green_bubble_one(subimage,
         return Circle(mid_peak.x, mid_peak.y, radius), signal
 
 
-def red_bubble_one(subimg):
-    plm = peak_local_max(subimg, min_distance=5)[0] #only one peak is needed
-    lm = Point(plm[0], plm[1])
+def red_bubble_one(subimg, verbose=True):
+    if verbose:
+        print("#-#-#-#-#-#- new_bubble -#-#-#-#-#-#-",
+              peak_local_max(subimg, min_distance=5, threshold_abs=50))
+
+    plm = peak_local_max(subimg, min_distance=5, threshold_abs=50)
+    #print(plm)#only one peak is needed
+    if len(plm) != 0:
+        print(plm)
+        plm = plm[0]
+        lm = Point(plm[0], plm[1])
+    else:
+        return Circle(1,1,1)
 
     size = 31
     xx = np.linspace(0, 10, size)
     yy = np.linspace(0, 10, size)
     XX, YY = np.meshgrid(xx, yy)
-    smooth_mask = utils.gauss_2d_mask([XX, YY], amp=10, mu=[5, 5], sigma=[1, 1])
+    smooth_mask = utils.gauss_2d_mask([XX, YY], amp=10, mu=[30, 30], sigma=[1, 1])
 
     curve = curve_from_orientation_fit(input_img=subimg,
                                        start_point=lm,
                                        smooth_mask=smooth_mask,
                                        len_curve_threshold=30,
-                                       proportion_threshold=2.2,
+                                       proportion_threshold=4,
                                        curve_preferred_direction="UP",
                                        include_first_point=True,
                                        fit_line_max_length=5,
-                                       fit_line_nb_samples=10,
-                                       fit_line_sample_box_size=1)
+                                       fit_line_nb_samples=5,
+                                       fit_line_sample_box_size=1,
+                                       verbose=verbose)
 
     curve += curve_from_orientation_fit(input_img=subimg,
                                        start_point=lm,
                                        smooth_mask=smooth_mask,
                                        len_curve_threshold=30,
-                                       proportion_threshold=2.2,
+                                       proportion_threshold=4,
                                        curve_preferred_direction="DOWN",
                                        include_first_point=False,
                                        fit_line_max_length=5,
                                        fit_line_nb_samples=10,
-                                       fit_line_sample_box_size=1)
-    print("################################### curve", curve)
+                                       fit_line_sample_box_size=1,
+                                       verbose=verbose)
+    #print("################################### curve", curve)
 
     return bubble_from_curve_fit(curve)
 

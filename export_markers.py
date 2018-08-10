@@ -3,7 +3,7 @@ import os
 D = bpy.data
 
 save_dir = 'C:\\Users\\windis\\Documents\\MSc_Habib\\gradient_ansatz\\data\\tracking_data'
-nb_frames = 30
+nb_frames = 200
 
 for clip in D.movieclips:
     for track in clip.tracking.tracks:
