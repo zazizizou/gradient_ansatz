@@ -14,8 +14,9 @@ from scipy.misc import imresize
 import pickle
 import utils
 from evaluate import inter_area
-from scipy.signal import argrelextrema
+from scipy.signal import argrelextrema, find_peaks_cwt
 from scipy.ndimage.filters import gaussian_filter1d
+from classify_bubble import detec_bubble
 
 """
 Coordinate system is:
@@ -881,18 +882,42 @@ def bubbles_from_image(img,
         return [bubble_from_curve(cu) for cu in curves]
 
 
+def circle_from_vertical_profile(vert_sig, sigma=1, widths=[4]):
+    idx_start = 0
+    idx_end = 2
+
+    vert_sig = gaussian_filter1d(vert_sig, sigma)
+
+    peaks_arg = find_peaks_cwt(vert_sig, widths)
+
+    if len(peaks_arg) >= 3:
+        idx_start = 1
+        idx_end = 3
+    elif len(peaks_arg) == 2:
+        idx_start = 0
+        idx_end = 2
+    elif len(peaks_arg) < 2:
+        return Circle(0, 0, 0)
+    upper_edge, lower_edge = peaks_arg[np.argsort(vert_sig[peaks_arg])][idx_start:idx_end]
+
+    radius = float(upper_edge - lower_edge) / 2
+    cent_x = float(upper_edge + lower_edge) / 2
+    return Circle(cent_x, np.nan, np.abs(radius))
+
+
 def green_bubble_one(subimage,
                      method,
                      hough_radii=None,
                      total_num_peaks=10,
                      max_offset=10,
-                     fit_refine=False):
+                     fit_refine=False,
+                     verbose=False):
     """
-    estimate bubble radius and position using hough circle transform,
-    assuming there is only one back lit bubble in subimage located around
+    estimate bubble radius and position using Hough circle transform,
+    assuming there is only one backlit bubble in subimage located around
     the image center.
     :param subimage: input image containing one bubble.
-    :param method: "hough" or "peak_dist"
+    :param method: "hough", "peak_dist" or "vertical_profile"
     :param hough_radii: list of radii candidates
     :param total_num_peaks: number of candidate bubbles
     :param max_offset: maximum distance between image center and circle center.
@@ -944,10 +969,26 @@ def green_bubble_one(subimage,
             right_peak.x = mu_right_peak_x + right_peak.x
         radius = dist(mid_peak, right_peak)
 
-        return Circle(mid_peak.x, mid_peak.y, radius), signal
+        return Circle(mid_peak.x, mid_peak.y, radius)
+
+    elif method == "vertical_profile":
+        max_circle =  Circle(1, 1, 1)
+        edges = scharr(subimage)
+        cent = im_center(subimage)
+        for idx in np.arange(int(cent.y - max_offset/2), int(cent.y + max_offset/2), 1):
+            vert_prof = edges[:, idx]
+            curr_circle = circle_from_vertical_profile(vert_prof)
+            curr_radius = curr_circle.radius
+            if verbose:
+                print("current radius:", curr_radius)
+            if curr_radius > max_circle.radius:
+                max_circle.radius = curr_radius
+                max_circle.y = idx
+                max_circle.x = curr_circle.x
+        return max_circle
 
 
-def red_bubble_one(subimg, smooth_mask, verbose=True):
+def red_bubble_one(subimg, method, smooth_mask=None, verbose=True):
 
     plm = peak_local_max(subimg, min_distance=5, threshold_abs=50)
 
@@ -960,32 +1001,49 @@ def red_bubble_one(subimg, smooth_mask, verbose=True):
     else:
         return Circle(1, 1, 1)
 
-    curve = curve_from_orientation_fit(input_img=subimg,
-                                       start_point=lm,
-                                       smooth_mask=smooth_mask,
-                                       len_curve_threshold=30,
-                                       proportion_threshold=4,
-                                       curve_preferred_direction="UP",
-                                       include_first_point=True,
-                                       fit_line_max_length=5,
-                                       fit_line_nb_samples=5,
-                                       fit_line_sample_box_size=1,
-                                       verbose=verbose)
+    if method == "circle_fit":
+        curve = curve_from_orientation_fit(input_img=subimg,
+                                           start_point=lm,
+                                           smooth_mask=smooth_mask,
+                                           len_curve_threshold=30,
+                                           proportion_threshold=4,
+                                           curve_preferred_direction="UP",
+                                           include_first_point=True,
+                                           fit_line_max_length=5,
+                                           fit_line_nb_samples=5,
+                                           fit_line_sample_box_size=1,
+                                           verbose=verbose)
 
-    curve += curve_from_orientation_fit(input_img=subimg,
-                                       start_point=lm,
-                                       smooth_mask=smooth_mask,
-                                       len_curve_threshold=30,
-                                       proportion_threshold=4,
-                                       curve_preferred_direction="DOWN",
-                                       include_first_point=False,
-                                       fit_line_max_length=5,
-                                       fit_line_nb_samples=10,
-                                       fit_line_sample_box_size=1,
-                                       verbose=verbose)
-    #print("################################### curve", curve)
+        curve += curve_from_orientation_fit(input_img=subimg,
+                                           start_point=lm,
+                                           smooth_mask=smooth_mask,
+                                           len_curve_threshold=30,
+                                           proportion_threshold=4,
+                                           curve_preferred_direction="DOWN",
+                                           include_first_point=False,
+                                           fit_line_max_length=5,
+                                           fit_line_nb_samples=10,
+                                           fit_line_sample_box_size=1,
+                                           verbose=verbose)
+        if verbose:
+            print("################################### curve", curve)
 
-    return bubble_from_curve_fit(curve)
+        return bubble_from_curve_fit(curve)
+
+    elif method == "peak_dist":
+        pred_circ = detec_bubble(subimg,
+                            calib_radius_func=lambda x: x,
+                            threshold_abs=50,
+                            min_distance = 10,
+                            classifier="bubble_forever",
+                            output_shape="Circle",
+                            signal_len=40,
+                            flip_signal=True,
+                            verbose=verbose)
+        return pred_circ
+
+    else:
+        print("method not supported")
 
 
 def main():

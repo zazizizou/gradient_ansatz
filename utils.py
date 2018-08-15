@@ -277,3 +277,9 @@ def gauss_fit_analytical(g0, g1, g2):
     return mu, sigma
 
 
+def gen_smooth_mask(shape, sigma):
+    xx = np.linspace(-20, 20, shape[0])
+    yy = np.linspace(-20, 20, shape[1])
+    XX, YY = np.meshgrid(xx, yy)
+    smooth_mask = gauss_2d_mask([XX, YY], amp=10, mu=[0, 0], sigma=sigma)
+    return smooth_mask
