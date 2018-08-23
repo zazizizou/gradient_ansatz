@@ -887,7 +887,6 @@ def circle_from_vertical_profile(vert_sig, sigma=1, widths=[4]):
     idx_end = 2
 
     vert_sig = gaussian_filter1d(vert_sig, sigma)
-
     peaks_arg = find_peaks_cwt(vert_sig, widths)
 
     if len(peaks_arg) >= 3:
@@ -911,6 +910,7 @@ def green_bubble_one(subimage,
                      total_num_peaks=10,
                      max_offset=10,
                      fit_refine=False,
+                     sigma=3,
                      verbose=False):
     """
     estimate bubble radius and position using Hough circle transform,
@@ -921,12 +921,15 @@ def green_bubble_one(subimage,
     :param hough_radii: list of radii candidates
     :param total_num_peaks: number of candidate bubbles
     :param max_offset: maximum distance between image center and circle center.
+    :param sigma: if method == vertical_profile, smooth vertical profile with
+            gaussian filter
     :param fit_refine: for method="peak_dist" only. If True refine position of center
-    and position of edge using an analytical gauss fit.
+            and position of edge using an analytical gauss fit.
     :return: Circle describing location and radius of bubble.
     """
     edges = sobel(subimage)
     im_cent = Point(int(subimage.shape[1]/2) , int(subimage.shape[0]/2))
+
     if method == "hough":
         hough_res = hough_circle(edges, hough_radii)
         _, center_x, center_y, radii = hough_circle_peaks(hough_res,
@@ -952,12 +955,26 @@ def green_bubble_one(subimage,
 
         for mo in range(max_offset):
             lm = [l for l in local_max_candidates if dist(l, im_cent) <= mo+1]
+            if verbose:
+                print("current image center candidate", [p.get_coord() for p in lm])
             if len(lm) == 1:
                 mid_peak = lm[0]
                 break
 
-        signal = edges[mid_peak.y, :]
-        right_peak_arg = argrelextrema(gaussian_filter1d(signal, sigma=2), np.greater)[0][-1]
+        signal = gaussian_filter1d(edges[mid_peak.y, :], sigma=sigma)
+        max_arg = argrelextrema(signal, np.greater)[0]
+
+        candidate_right_peak_args = [y - mid_peak.y for y in max_arg if y - mid_peak.y > 0]
+        if len(candidate_right_peak_args) > 0:
+            min_dist = min(candidate_right_peak_args)
+            print("min distance to image center", min_dist)
+        else:
+            return Circle(1,1,1)
+        if verbose:
+            print("max_arg", max_arg)
+            print("len max_arg", len(max_arg))
+            print("signal local maxima:", [signal[arg] for arg in max_arg])
+        right_peak_arg = [arg for arg in max_arg if np.abs(arg-mid_peak.y) == min_dist][0]
         right_peak = Point(right_peak_arg, mid_peak.y)
 
         if fit_refine:
@@ -967,7 +984,13 @@ def green_bubble_one(subimage,
 
             mu_right_peak_x, _ = utils.gauss_fit_analytical(g0, g1, g2)
             right_peak.x = mu_right_peak_x + right_peak.x
+            if verbose:
+                print("mu_right_peak_x", mu_right_peak_x)
+                print("right_peak:", right_peak.get_coord())
+
         radius = dist(mid_peak, right_peak)
+        if verbose:
+            print("radius =", radius)
 
         return Circle(mid_peak.x, mid_peak.y, radius)
 
@@ -977,7 +1000,7 @@ def green_bubble_one(subimage,
         cent = im_center(subimage)
         for idx in np.arange(int(cent.y - max_offset/2), int(cent.y + max_offset/2), 1):
             vert_prof = edges[:, idx]
-            curr_circle = circle_from_vertical_profile(vert_prof)
+            curr_circle = circle_from_vertical_profile(vert_prof, sigma=sigma)
             curr_radius = curr_circle.radius
             if verbose:
                 print("current radius:", curr_radius)
@@ -986,6 +1009,9 @@ def green_bubble_one(subimage,
                 max_circle.y = idx
                 max_circle.x = curr_circle.x
         return max_circle
+
+    else:
+        raise ValueError("method " + method + " is not supported")
 
 
 def red_bubble_one(subimg, method, smooth_mask=None, verbose=True):
@@ -999,7 +1025,7 @@ def red_bubble_one(subimg, method, smooth_mask=None, verbose=True):
         plm = plm[0]
         lm = Point(plm[0], plm[1])
     else:
-        return Circle(1, 1, 1)
+        return [Circle(1, 1, 1)]
 
     if method == "circle_fit":
         curve = curve_from_orientation_fit(input_img=subimg,
@@ -1034,16 +1060,19 @@ def red_bubble_one(subimg, method, smooth_mask=None, verbose=True):
         pred_circ = detec_bubble(subimg,
                             calib_radius_func=lambda x: x,
                             threshold_abs=50,
-                            min_distance = 10,
+                            min_distance=10,
                             classifier="bubble_forever",
                             output_shape="Circle",
                             signal_len=40,
                             flip_signal=True,
                             verbose=verbose)
-        return pred_circ
+        mean_radii = np.mean([pr.radius for pr in pred_circ])
+        valid_bubbles = [prc for prc in pred_circ
+                         if prc.radius >= mean_radii]# and len(pred_circ) > 1]
+        return valid_bubbles
 
     else:
-        print("method not supported")
+        print("method '{0}' not supported".format(method))
 
 
 def main():

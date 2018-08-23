@@ -181,6 +181,21 @@ def detec_bubble(img,
                  flip_signal=False,
                  return_signals_only=False,
                  verbose=False):
+    """
+
+    :param img:
+    :param calib_radius_func:
+    :param signal_len:
+    :param classifier: "cnn", "logistic_regression" or "bubble_forever"
+    :param threshold_abs:
+    :param min_distance:
+    :param output_shape: "Circle" or "Rectangle"
+    :param sigma:
+    :param flip_signal:
+    :param return_signals_only:
+    :param verbose:
+    :return:
+    """
 
     signals_x, signals_y, signals_z = get_candidate_signals(img,
                                                             signal_len,
@@ -195,7 +210,8 @@ def detec_bubble(img,
         return signals_x, signals_y, signals_z
 
     bubbles = [get_bubble_from_signal(sig_x, sig_y, sig_z,
-                                      calib_radius_func, sigma, flip_signal, verbose=verbose)
+                                      calib_radius_func, sigma,
+                                      flip_signal, verbose=verbose)
                             for (sig_x, sig_y, sig_z) in zip(signals_x, signals_y, signals_z)
                             if is_bubble(sig_z, classifier)]
 

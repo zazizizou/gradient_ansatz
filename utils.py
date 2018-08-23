@@ -263,9 +263,10 @@ def get_tracking_data(tracking_data_path, img_shape):
     x_dim = img_shape[1]
     y_dim = img_shape[0]
     frames, x_arr, y_arr = np.loadtxt(tracking_data_path).T
-    positions = []
-    for f, x, y in zip(frames, x_arr, y_arr):
-        positions.append(shapes.Point(x*x_dim, y*y_dim, int(f)))
+
+    positions = [shapes.Point(x*x_dim, y*y_dim, int(f))
+                 for f, x, y in zip(frames, x_arr, y_arr)]
+
     return [ll_to_ul(pos, x_dim) for pos in positions]
 
 
@@ -277,9 +278,9 @@ def gauss_fit_analytical(g0, g1, g2):
     return mu, sigma
 
 
-def gen_smooth_mask(shape, sigma):
+def gen_smooth_mask(shape, sigma, mu=[0, 0], amp=10):
     xx = np.linspace(-20, 20, shape[0])
     yy = np.linspace(-20, 20, shape[1])
     XX, YY = np.meshgrid(xx, yy)
-    smooth_mask = gauss_2d_mask([XX, YY], amp=10, mu=[0, 0], sigma=sigma)
+    smooth_mask = gauss_2d_mask([XX, YY], amp=amp, mu=mu, sigma=sigma)
     return smooth_mask
