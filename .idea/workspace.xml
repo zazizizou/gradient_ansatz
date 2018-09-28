@@ -3,20 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="8800dc96-baa0-4ddc-8673-220ccbbd64a5" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/radius_calibration-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/radius_calibration-checkpoint.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Radius_calib_track.blend" beforeDir="false" afterPath="$PROJECT_DIR$/Radius_calib_track.blend" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Radius_calib_track.blend1" beforeDir="false" afterPath="$PROJECT_DIR$/Radius_calib_track.blend1" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Radius_depth_dependency.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Radius_depth_dependency.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classify_bubble.py" beforeDir="false" afterPath="$PROJECT_DIR$/classify_bubble.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/tracking_data/greenlit_Track.001.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/tracking_data/greenlit_Track.001.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/tracking_data/greenlit_Track.003.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/tracking_data/greenlit_Track.003.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/tracking_data/greenlit_Track.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/tracking_data/greenlit_Track.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/tracking_data/greenlit_green_bubble.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/tracking_data/greenlit_green_bubble.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/detect_bubbles.py" beforeDir="false" afterPath="$PROJECT_DIR$/detect_bubbles.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DoF_cailb.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/DoF_cailb.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/radius_calibration.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/radius_calibration.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/subpixel_orioentation.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/subpixel_orioentation.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train&amp;classify.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/train&amp;classify.ipynb" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -61,46 +54,31 @@
     <splitter split-orientation="horizontal" split-proportion="0.49840763">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="true">
+          <file leaf-file-name="detect_bubbles.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/detect_bubbles.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-1189">
-                  <caret line="951" column="53" selection-start-line="951" selection-start-column="53" selection-end-line="951" selection-end-column="53" />
+                <state relative-caret-position="379">
+                  <caret line="41" selection-start-line="41" selection-end-line="42" selection-end-column="45" />
                 </state>
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/bubbleNet1D.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="420">
-                  <caret line="35" column="15" selection-start-line="35" selection-start-column="4" selection-end-line="35" selection-end-column="15" />
-                  <folding>
-                    <element signature="e#0#35#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
+          <file leaf-file-name="utils.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/utils.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1392">
-                  <caret line="226" column="21" selection-start-line="226" selection-start-column="21" selection-end-line="226" selection-end-column="21" />
+                <state relative-caret-position="2646">
+                  <caret line="195" column="2" selection-start-line="195" selection-start-column="2" selection-end-line="195" selection-end-column="2" />
                   <folding>
                     <element signature="e#0#18#0" expanded="true" />
-                    <marker date="1534495167108" expanded="true" signature="409:412" ph="..." />
-                    <marker date="1534495167108" expanded="true" signature="7688:7693" ph="..." />
-                    <marker date="1534495167108" expanded="true" signature="7961:7966" ph="..." />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file leaf-file-name="evaluate.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/evaluate.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="195">
+                <state relative-caret-position="182">
                   <caret line="14" column="4" selection-start-line="14" selection-start-column="4" selection-end-line="14" selection-end-column="4" />
                 </state>
               </provider>
@@ -110,23 +88,11 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="true">
+          <file leaf-file-name="shapes.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/shapes.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="480">
-                  <caret line="78" column="36" selection-start-line="78" selection-start-column="36" selection-end-line="78" selection-end-column="36" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/classify_bubble.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="270">
-                  <caret line="75" column="42" selection-start-line="75" selection-start-column="42" selection-end-line="75" selection-end-column="42" />
-                  <folding>
-                    <element signature="e#0#18#0" expanded="true" />
-                  </folding>
+                <state relative-caret-position="90">
+                  <caret line="76" column="18" selection-start-line="76" selection-start-column="18" selection-end-line="76" selection-end-column="18" />
                 </state>
               </provider>
             </entry>
@@ -144,7 +110,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>refined_cur</find>
       <find>Image</find>
       <find>(_</find>
       <find>pad</find>
@@ -164,7 +129,6 @@
       <find>im_cen</find>
       <find>im_cent</find>
       <find>no fit,</find>
-      <find>curve_fit</find>
       <find>gaussian_filter1d</find>
       <find>smooth(</find>
       <find>resize_</find>
@@ -174,6 +138,8 @@
       <find>Circle(1,1,1</find>
       <find>second_peak_x</find>
       <find>argre</find>
+      <find>curve_fit</find>
+      <find>g</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -193,10 +159,10 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="1909" />
-    <option name="width" value="1940" />
-    <option name="height" value="2111" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="y" value="22" />
+    <option name="width" value="1235" />
+    <option name="height" value="778" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -204,6 +170,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -215,7 +182,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -257,9 +223,6 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
@@ -281,32 +244,63 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1273" y="0" width="1293" height="1407" extended-state="0" />
+    <frame x="0" y="22" width="1235" height="778" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.18745218" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.3288854" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.31955922" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39914772" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18704453" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32967034" />
       <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" weight="0.32967034" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.31955922" />
       <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info anchor="bottom" id="Python Console" order="10" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32967034" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39914772" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3288854" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/detect_bubbles.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="11746">
+          <caret line="839" lean-forward="true" selection-start-line="839" selection-end-line="839" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2646">
+          <caret line="195" column="2" lean-forward="true" selection-start-line="195" selection-start-column="2" selection-end-line="195" selection-end-column="2" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/evaluate.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="14" column="4" selection-start-line="14" selection-start-column="4" selection-end-line="14" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/shapes.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1078">
+          <caret line="78" column="36" selection-start-line="78" selection-start-column="36" selection-end-line="78" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/../ring_ansatz/evaluate.py" />
     <entry file="file://$PROJECT_DIR$/../utils/utils.py" />
     <entry file="file://$USER_HOME$/anaconda/lib/python3.5/site-packages/scipy/optimize/minpack.py" />
@@ -317,54 +311,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/310767749/numpy/core/umath.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="326">
-          <caret line="875" column="4" selection-start-line="875" selection-start-column="4" selection-end-line="875" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/310767749/builtins.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1429">
-          <caret line="732" column="8" selection-start-line="732" selection-start-column="8" selection-end-line="732" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/310767749/cv2/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="416">
-          <caret line="1867" selection-start-line="1867" selection-end-line="1867" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/skimage/feature/peak.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="24" column="4" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/scipy/ndimage/filters.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="416">
-          <caret line="190" column="4" selection-start-line="190" selection-start-column="4" selection-end-line="190" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/310767749/numpy/core/umath.py" />
+    <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/310767749/builtins.py" />
+    <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/310767749/cv2/__init__.py" />
+    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/skimage/feature/peak.py" />
+    <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/scipy/ndimage/filters.py" />
     <entry file="file://$PROJECT_DIR$/bubbleNet1D.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="420">
           <caret line="35" column="15" selection-start-line="35" selection-start-column="4" selection-end-line="35" selection-end-column="15" />
-          <folding>
-            <element signature="e#0#35#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/evaluate.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
+        <state relative-caret-position="182">
           <caret line="14" column="4" selection-start-line="14" selection-start-column="4" selection-end-line="14" selection-end-column="4" />
         </state>
       </provider>
@@ -373,36 +334,30 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
           <caret line="75" column="42" selection-start-line="75" selection-start-column="42" selection-end-line="75" selection-end-column="42" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/shapes.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="78" column="36" selection-start-line="78" selection-start-column="36" selection-end-line="78" selection-end-column="36" />
+        <state relative-caret-position="90">
+          <caret line="76" column="18" selection-start-line="76" selection-start-column="18" selection-end-line="76" selection-end-column="18" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1392">
-          <caret line="226" column="21" selection-start-line="226" selection-start-column="21" selection-end-line="226" selection-end-column="21" />
+        <state relative-caret-position="2646">
+          <caret line="195" column="2" selection-start-line="195" selection-start-column="2" selection-end-line="195" selection-end-column="2" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <marker date="1534495167108" expanded="true" signature="409:412" ph="..." />
-            <marker date="1534495167108" expanded="true" signature="7688:7693" ph="..." />
-            <marker date="1534495167108" expanded="true" signature="7961:7966" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/detect_bubbles.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1189">
-          <caret line="951" column="53" selection-start-line="951" selection-start-column="53" selection-end-line="951" selection-end-column="53" />
+        <state relative-caret-position="379">
+          <caret line="41" selection-start-line="41" selection-end-line="42" selection-end-column="45" />
         </state>
       </provider>
     </entry>
